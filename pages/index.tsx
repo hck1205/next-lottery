@@ -6,6 +6,11 @@ import { css } from '@emotion/react';
 
 import 'antd/dist/antd.css';
 
+import LotteryNumberRange from '../components/NumberRange';
+import LotteryNumberOfNumbers from '../components/NumberOfNumbers';
+import LotteryNumberMethod from '../components/NumberMethod';
+import CorrectedNumber from '../components/CorrectedNumber';
+
 const { Option } = Select;
 
 type Props = {};
@@ -117,16 +122,16 @@ function Lottery({}: Props) {
           `${correctCnt}_corrected`
         ] = ++numberOfTimesOfCorrection[`${correctCnt}_corrected`];
 
-        if (correctCnt > 2) {
-          const correctHistory = document.getElementById(
-            `category__sub__history__${correctCnt}`
-          );
-          if (correctHistory) {
-            correctHistory.innerHTML += `<span>${JSON.stringify(
-              buyNumber
-            )}</span>`;
-          }
+        // if (correctCnt > 2) {
+        const correctHistory = document.getElementById(
+          `category__sub__history__${correctCnt}`
+        );
+        if (correctHistory) {
+          correctHistory.innerHTML += `<span>${JSON.stringify(
+            buyNumber
+          )}</span>`;
         }
+        // }
 
         for (let i = 0; i <= numberOfInputs; i++) {
           const correctPercentage = document.getElementById(
@@ -134,10 +139,20 @@ function Lottery({}: Props) {
           );
 
           const correctedCnt = numberOfTimesOfCorrection[`${i}_corrected`];
-
           if (correctPercentage) {
             const percentage = (100 * correctedCnt) / gameCount;
-            correctPercentage.innerHTML = `<div>${percentage} %</div> <div>${correctedCnt} 회</div>`;
+
+            correctPercentage.innerHTML = `<div>${percentage.toFixed(
+              5
+            )} %</div>`;
+          }
+
+          const correctedCntEle = document.getElementById(
+            `category__sub__corrected__cnt__${i}`
+          );
+
+          if (correctedCntEle) {
+            correctedCntEle.innerHTML = `<div>${correctedCnt}회</div>`;
           }
         }
       }
@@ -148,7 +163,7 @@ function Lottery({}: Props) {
           gameCount * costForOneTry
         ).toLocaleString('ko-KR')}원`;
       }
-    }, 20);
+    }, 50);
     setGameStart(true);
     setIntervalId(updateText);
   };
@@ -203,9 +218,6 @@ function Lottery({}: Props) {
         periodYearText.current.innerHTML = '';
       }
 
-      // setRangeStartNum(1);
-      // setRangeEndNum(45);
-      // setNumberOfInputs(5);
       setGenWinNumType(true);
       setGenWinNumList([]);
       setGenBuyNumType(true);
@@ -236,287 +248,149 @@ function Lottery({}: Props) {
 
   return (
     <PageWrapper>
-      <ContentWrapper></ContentWrapper>
-      <ConfigTable>
-        <tbody>
-          <tr>
-            <td colSpan={5}>
-              <StatisticsWrapper>
-                <ul>
+      <ContentWrapper>
+        <ul>
+          <li>
+            <h1>진행상황</h1>
+
+            <StatisticsWrapper>
+              <ul>
+                <li>
+                  게임 횟수:
+                  <span ref={gameCountText}>{` ${gameCount}`}</span>
+                </li>
+                <li>
+                  <span>투자금: </span>
+                  <div ref={moneySpendOnBuying} />
+                </li>
+                {/* <li>수익금:</li> */}
+                {genWinNumType && (
                   <li>
-                    게임 횟수:
-                    <span ref={gameCountText}>{` ${gameCount}`}</span>
+                    당첨 로또 생성번호: <div ref={winNumberText} />
                   </li>
-
-                  {genWinNumType && (
-                    <li>
-                      당첨 로또 생성번호: <span ref={winNumberText} />
-                    </li>
-                  )}
-                  {genBuyNumType && (
-                    <li>
-                      구입 로또 생성번호: <span ref={buyNumberText} />
-                    </li>
-                  )}
-                </ul>
-
-                <ul>
+                )}
+                {genBuyNumType && (
                   <li>
-                    <span>투자금: </span>
-                    <span ref={moneySpendOnBuying} />
+                    구입 로또 생성번호: <div ref={buyNumberText} />
                   </li>
-                  {/* <li>수익금:</li> */}
+                )}
+              </ul>
 
-                  <li>
-                    <span>기간: </span>
-                    <span ref={periodDayText}>{` ${periodDay}일`}</span>
-                    <span ref={periodMonthText} />
-                    <span ref={periodYearText} />
-                    <p>(일주일에 5장 구매시)</p>
-                  </li>
-                </ul>
-              </StatisticsWrapper>
-            </td>
-          </tr>
-          <tr>
-            <td colSpan={5}>
-              <ButtonWrapper>
-                <Button
-                  type="primary"
-                  onClick={() => {
-                    if (
-                      (!genBuyNumType &&
-                        genBuyNumList.length === numberOfInputs) ||
-                      (!genWinNumType &&
-                        genWinNumList.length === numberOfInputs) ||
-                      (genBuyNumType && genWinNumType)
-                    ) {
-                      startGame();
-                    }
-                  }}
-                  block
-                >
-                  시작
-                </Button>
-
-                <Button
-                  type="default"
-                  onClick={() => {
-                    stopGame();
-                  }}
-                  block
-                  danger
-                >
-                  정지
-                </Button>
-                <Button type="default" onClick={() => resetGame()} block>
-                  초기화
-                </Button>
-              </ButtonWrapper>
-            </td>
-          </tr>
-          {/* 숫자 범위 */}
-          <tr>
-            <td id="category__main">로또 번호</td>
-            <td id="category__sub">숫자 범위</td>
-            <td>
-              <div id="content">
-                <Select
-                  value={rangeStartNum}
-                  defaultValue={1}
-                  onChange={(value) => {
-                    setRangeStartNum(value);
-                    resetGame();
-                  }}
-                  style={{ width: 70 }}
-                  disabled={gameStart}
-                >
-                  {[...Array(99)].map((_, index) => {
-                    return (
-                      <Option
-                        key={`range_start_num_${index}`}
-                        value={index + 1}
-                      >
-                        {index + 1}
-                      </Option>
-                    );
-                  })}
-                </Select>
-                ~
-                <Select
-                  value={rangeEndNum}
-                  defaultValue={1}
-                  onChange={(value) => {
-                    setRangeEndNum(value);
-                    resetGame();
-                  }}
-                  style={{ width: 70 }}
-                  disabled={gameStart}
-                >
-                  {[...Array(99 - rangeStartNum)].map((_, index) => {
-                    return (
-                      <Option
-                        key={`range_end_num_${index}`}
-                        value={index + rangeStartNum + 1}
-                      >
-                        {index + rangeStartNum + 1}
-                      </Option>
-                    );
-                  })}
-                </Select>
-              </div>
-            </td>
-
-            <td id="category__sub">숫자 갯수</td>
-            <td>
-              <div id="content">
-                <Select
-                  value={numberOfInputs}
-                  defaultValue={5}
-                  onChange={(value) => {
-                    setNumberOfInputs(value);
-                    resetGame();
-                  }}
-                  style={{ width: 70 }}
-                  disabled={gameStart}
-                >
-                  {[...Array(3)].map((_, index) => {
-                    const value = index + 5;
-                    return (
-                      <Option key={`range_end_num_${index}`} value={value}>
-                        {value}
-                      </Option>
-                    );
-                  })}
-                </Select>
-              </div>
-            </td>
-          </tr>
-
-          {/* 당첨번호 */}
-          <tr>
-            <td id={'category__main'}>당첨 번호</td>
-            <td id={'category__sub'}>생성방법</td>
-            <td>
-              <div id="content">
-                <Switch
-                  defaultChecked
-                  checkedChildren="자동"
-                  unCheckedChildren="수동"
-                  onChange={(isGenAuto) => {
-                    isGenAuto && setGenWinNumList([]);
-                    setGenWinNumType(isGenAuto);
-                  }}
-                  checked={genWinNumType}
-                  size={'default'}
-                  disabled={gameStart || !genBuyNumType}
+              <ul>
+                <li>
+                  <span>기간: </span>
+                  <p>(일주일에 5장 구매시)</p>
+                  <div ref={periodDayText}>{` ${periodDay}일`}</div>
+                  <div ref={periodMonthText} />
+                  <div ref={periodYearText} />
+                </li>
+              </ul>
+            </StatisticsWrapper>
+          </li>
+          <li>
+            <h1>로또번호 설정</h1>
+            <div className="contents">
+              <span>숫자범위</span>
+              <span>
+                <LotteryNumberRange
+                  rangeStartNum={rangeStartNum}
+                  setRangeStartNum={setRangeStartNum}
+                  resetGame={resetGame}
+                  gameStart={gameStart}
+                  rangeEndNum={rangeEndNum}
+                  setRangeEndNum={setRangeEndNum}
                 />
-              </div>
-            </td>
+              </span>
+            </div>
 
-            <td id={'category__sub'}>입력</td>
-            <td>
-              <div id="content">
-                <Select
-                  mode="multiple"
-                  allowClear
-                  style={{ minWidth: 250 }}
-                  placeholder={genWinNumType ? '' : '당첨 번호를 선택해주세요.'}
-                  value={genWinNumList}
-                  onChange={(selectedList) => {
-                    if (selectedList.length <= numberOfInputs) {
-                      setGenWinNumList(selectedList);
-                    }
-                  }}
-                  disabled={gameStart || genWinNumType}
-                >
-                  {getSelectOptionList({ rangeStartNum, rangeEndNum })}
-                </Select>
-              </div>
-            </td>
-          </tr>
-
-          {/* 구입번호 */}
-          <tr>
-            <td id={'category__main'}>구입 번호</td>
-            <td id={'category__sub'}>생성방법</td>
-            <td>
-              <div id="content">
-                <Switch
-                  defaultChecked
-                  checkedChildren="자동"
-                  unCheckedChildren="수동"
-                  onChange={(isGenAuto) => {
-                    isGenAuto && setGenBuyNumList([]);
-                    setGenBuyNumType(isGenAuto);
-                  }}
-                  checked={genBuyNumType}
-                  disabled={gameStart || !genWinNumType}
+            <div className="contents">
+              <span>숫자갯수</span>
+              <span>
+                <LotteryNumberOfNumbers
+                  numberOfInputs={numberOfInputs}
+                  setNumberOfInputs={setNumberOfInputs}
+                  resetGame={resetGame}
+                  gameStart={gameStart}
                 />
-              </div>
-            </td>
+              </span>
+            </div>
 
-            <td id={'category__sub'}>입력</td>
-            <td>
-              <div id="content">
-                <Select
-                  mode="multiple"
-                  allowClear
-                  style={{ minWidth: 250 }}
-                  placeholder={
-                    genBuyNumType ? '' : '구매하실 로또번호를 선택해주세요.'
+            <div className="contents">
+              <span>당첨번호</span>
+
+              <LotteryNumberMethod
+                setGenNumList={setGenWinNumList}
+                genNumList={genWinNumList}
+                numberOfInputs={numberOfInputs}
+                setGenNumType={setGenWinNumType}
+                rangeStartNum={rangeStartNum}
+                rangeEndNum={rangeEndNum}
+                checked={genWinNumType}
+                gameStart={gameStart}
+              />
+            </div>
+
+            <div className="contents">
+              <span>구입번호</span>
+
+              <LotteryNumberMethod
+                setGenNumList={setGenBuyNumList}
+                genNumList={genBuyNumList}
+                numberOfInputs={numberOfInputs}
+                setGenNumType={setGenBuyNumType}
+                rangeStartNum={rangeStartNum}
+                rangeEndNum={rangeEndNum}
+                checked={genBuyNumType}
+                gameStart={gameStart}
+              />
+            </div>
+          </li>
+          <li>
+            <ButtonWrapper>
+              <Button
+                type="primary"
+                onClick={() => {
+                  if (
+                    (!genBuyNumType &&
+                      genBuyNumList.length === numberOfInputs) ||
+                    (!genWinNumType &&
+                      genWinNumList.length === numberOfInputs) ||
+                    (genBuyNumType && genWinNumType)
+                  ) {
+                    !gameStart && startGame();
                   }
-                  value={genBuyNumList}
-                  onChange={(selectedList) => {
-                    if (selectedList.length <= numberOfInputs) {
-                      setGenBuyNumList(selectedList);
-                    }
-                  }}
-                  disabled={gameStart || genBuyNumType}
-                >
-                  {getSelectOptionList({ rangeStartNum, rangeEndNum })}
-                </Select>
-              </div>
-            </td>
-          </tr>
-          <tr>
-            <td id={'category__main'}>적중한 갯수</td>
-            <td id={'category__sub'} colSpan={2}>
-              적중 확률
-            </td>
-            <td id={'category__sub'} colSpan={2}>
-              적중한 숫자기록
-            </td>
-          </tr>
-          {[...Array(numberOfInputs + 1)].map((_, index) => {
-            return (
-              <tr key={`target_number_${index}`}>
-                <td id={'category__sub'}>{`${
-                  numberOfInputs - index
-                }개 맞춤`}</td>
-                <td colSpan={2}>
-                  <div
-                    className="percentage"
-                    id={`category__sub__percentage__${numberOfInputs - index}`}
-                  />
-                </td>
-                <td
-                  colSpan={2}
-                  id={`${3 > numberOfInputs - index ? 'gray' : 'white'}`}
-                >
-                  <div
-                    className="history"
-                    id={`category__sub__history__${numberOfInputs - index}`}
-                  />
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </ConfigTable>
+                }}
+                block
+              >
+                시작
+              </Button>
+
+              <Button
+                type="default"
+                onClick={() => {
+                  stopGame();
+                }}
+                block
+                danger
+              >
+                정지
+              </Button>
+              <Button type="default" onClick={() => resetGame()} block>
+                초기화
+              </Button>
+            </ButtonWrapper>
+          </li>
+          <li>
+            <h1>적중기록</h1>
+            <CorrectedNumber numberOfInputs={numberOfInputs} />
+          </li>
+        </ul>
+      </ContentWrapper>
     </PageWrapper>
   );
 }
+
+const sidePadding = 30;
 
 const FLEX_CONTER = css`
   display: flex;
@@ -524,69 +398,51 @@ const FLEX_CONTER = css`
   justify-content: center;
 `;
 
-const ContentWrapper = styled.div``;
+const ContentWrapper = styled.div`
+  background-color: #fff;
+
+  ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+
+    li {
+      h1 {
+        font-size: 16px;
+        font-weight: bold;
+        text-align: left;
+        border-bottom: 1px solid #dedede;
+        padding: 0 ${sidePadding - 5}px;
+        margin: 0;
+        height: 50px;
+        line-height: 50px;
+        background-color: #ececec;
+        color: #353535;
+
+        @media only screen and (max-width: 768px) {
+          padding: 0 15px;
+        }
+      }
+
+      .contents {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px ${sidePadding}px;
+
+        @media only screen and (max-width: 768px) {
+          padding: 10px 20px;
+        }
+      }
+    }
+  }
+`;
 
 const PageWrapper = styled.div`
   max-width: 1080px;
   width: 100%;
   margin: auto;
-  padding: 50px 0;
-`;
-
-const ConfigTable = styled.table`
-  border-collapse: collapse;
-  width: 100%;
-
-  tr,
-  td {
-    border: 1px solid #dedede;
-    max-width: 300px;
-    height: 150px;
-
-    &#category__main {
-      width: 150px;
-      height: 100px;
-      font-weight: bold;
-      font-size: 16px;
-      text-align: center;
-    }
-
-    &#category__sub {
-      width: 150px;
-      height: 100px;
-      font-size: 14px;
-      text-align: center;
-    }
-
-    .percentage {
-      text-align: center;
-    }
-
-    .history {
-      overflow: auto;
-      max-height: 150px;
-      padding: 0 20px;
-
-      span {
-        padding: 10px 15px;
-        display: inline-block;
-      }
-    }
-
-    &#gray {
-      background-color: #f5f5f5;
-    }
-
-    #content {
-      ${FLEX_CONTER}
-      /* padding: 0 10px; */
-
-      input {
-        width: 40px;
-        margin: 0 2px;
-      }
-    }
-  }
+  background-color: #f2f4f7;
 `;
 
 const ButtonWrapper = styled.div`
@@ -601,15 +457,19 @@ const ButtonWrapper = styled.div`
 const StatisticsWrapper = styled.div`
   display: flex;
   align-items: center;
-  margin-top: 15px;
+  justify-content: space-between;
+  padding: 10px ${sidePadding}px;
+  @media only screen and (max-width: 768px) {
+    padding: 10px 20px;
+  }
 
   ul {
     list-style-type: none;
-    width: 100%;
 
     li {
       margin: 10px 0;
       font-weight: bold;
+
       p {
         font-size: 12px;
         color: #888888;
