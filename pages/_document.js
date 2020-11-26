@@ -10,7 +10,7 @@ class MyDocument extends Document {
     return (
       <Html lang="ko">
         <title>Lottery Simulator</title>
-        <meta charset="UTF-8" />
+        <meta charSet="UTF-8" />
         <meta
           name="description"
           content="Do you want to know your lucky number? Simulate random lottery number and check out magic numbers"

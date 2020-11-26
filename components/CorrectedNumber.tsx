@@ -14,7 +14,7 @@ function CorrectedNumber({ numberOfInputs }: Props) {
       <Collapse accordion>
         {[...Array(numberOfInputs + 1)].map((_, index) => {
           const header = (
-            <div className="percentage">
+            <div key={`percentage_number_${index}`} className="percentage">
               <div>{`${numberOfInputs - index}자리 맞춤`}</div>
               <span className="splitter" />
               <div
@@ -29,7 +29,7 @@ function CorrectedNumber({ numberOfInputs }: Props) {
           );
 
           const history = (
-            <div key={`target_number_${index}`}>
+            <div key={`history_number_${index}`}>
               <div className={'numbers'}>
                 <div
                   className="history"
@@ -39,7 +39,11 @@ function CorrectedNumber({ numberOfInputs }: Props) {
             </div>
           );
           return (
-            <Panel header={header} key={`target_number_${index}`}>
+            <Panel
+              header={header}
+              key={`target_number_${index}`}
+              forceRender={true}
+            >
               {history}
             </Panel>
           );
