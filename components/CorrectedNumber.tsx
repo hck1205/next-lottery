@@ -1,3 +1,7 @@
+import { Collapse } from 'antd';
+
+const { Panel } = Collapse;
+
 import styled from '@emotion/styled';
 
 type Props = {
@@ -7,46 +11,58 @@ type Props = {
 function CorrectedNumber({ numberOfInputs }: Props) {
   return (
     <Wrapper>
-      {[...Array(numberOfInputs + 1)].map((_, index) => (
-        <div key={`target_number_${index}`}>
-          <div className="percentage">
-            <div>{`${numberOfInputs - index}자리 맞춤`}</div>
-            <span className="splitter" />
-            <div
-              className="percentage"
-              id={`category__sub__percentage__${numberOfInputs - index}`}
-            />
-            <span className="splitter" />
-            <div
-              id={`category__sub__corrected__cnt__${numberOfInputs - index}`}
-            />
-          </div>
-          <div className={'numbers'}>
-            <div
-              className="history"
-              id={`category__sub__history__${numberOfInputs - index}`}
-            ></div>
-          </div>
-        </div>
-      ))}
+      <Collapse accordion>
+        {[...Array(numberOfInputs + 1)].map((_, index) => {
+          const header = (
+            <div className="percentage">
+              <div>{`${numberOfInputs - index}자리 맞춤`}</div>
+              <span className="splitter" />
+              <div
+                className="percentage"
+                id={`category__sub__percentage__${numberOfInputs - index}`}
+              />
+              <span className="splitter" />
+              <div
+                id={`category__sub__corrected__cnt__${numberOfInputs - index}`}
+              />
+            </div>
+          );
+
+          const history = (
+            <div key={`target_number_${index}`}>
+              <div className={'numbers'}>
+                <div
+                  className="history"
+                  id={`category__sub__history__${numberOfInputs - index}`}
+                ></div>
+              </div>
+            </div>
+          );
+          return (
+            <Panel header={header} key={`target_number_${index}`}>
+              {history}
+            </Panel>
+          );
+        })}
+      </Collapse>
     </Wrapper>
   );
 }
 const sidePadding = 30;
 const Wrapper = styled.div`
+  .ant-collapse-content-box {
+    padding: 5px;
+  }
   .percentage {
     display: flex;
-    padding: 5px 0;
     justify-content: space-around;
     align-items: center;
-    height: 40px;
     font-weight: bold;
-    border-bottom: 1px solid #ececec;
   }
 
   .numbers {
     span {
-      padding: 0 10px;
+      /* padding: 0 10px; */
     }
   }
 
@@ -62,8 +78,25 @@ const Wrapper = styled.div`
       padding: 10px 10px;
     }
 
-    span {
-      padding: 5px 15px;
+    .numbers-wrapper {
+      padding: 0 6px;
+      background: #e2e2e2;
+      border-radius: 11px;
+      margin: 6px 0;
+
+      span {
+        padding: 0 2.5px;
+      }
+
+      .corrected {
+        background-color: #5c5cea;
+        color: white;
+        border-radius: 13px;
+        display: inline-block;
+        width: 24px;
+        border: 1px solid #adadad;
+        text-align: center;
+      }
     }
   }
 

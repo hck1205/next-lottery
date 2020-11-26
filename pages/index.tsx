@@ -10,6 +10,7 @@ import LotteryNumberRange from '../components/NumberRange';
 import LotteryNumberOfNumbers from '../components/NumberOfNumbers';
 import LotteryNumberMethod from '../components/NumberMethod';
 import CorrectedNumber from '../components/CorrectedNumber';
+import mitt from 'next/dist/next-server/lib/mitt';
 
 const { Option } = Select;
 
@@ -111,9 +112,13 @@ function Lottery({}: Props) {
 
       if (winNumber.length > 0 && buyNumber.length > 0) {
         let correctCnt = 0;
+        let correctIndexList = [];
         for (let i = 0; i < winNumber.length; i++) {
           for (let j = 0; j < buyNumber.length; j++) {
-            if (winNumber[i] === buyNumber[j]) ++correctCnt;
+            if (winNumber[i] === buyNumber[j]) {
+              ++correctCnt;
+              correctIndexList.push(j);
+            }
           }
         }
 
@@ -127,9 +132,15 @@ function Lottery({}: Props) {
           `category__sub__history__${correctCnt}`
         );
         if (correctHistory) {
-          correctHistory.innerHTML += `<span>${JSON.stringify(
-            buyNumber
-          )}</span>`;
+          let dynamicInnerHtml = "<div class='numbers-wrapper'>";
+
+          for (let i = 0; i < buyNumber.length; i++) {
+            dynamicInnerHtml += `<span class=${
+              correctIndexList.indexOf(i) > -1 ? 'corrected' : 'incorrected'
+            }>${buyNumber[i]}</span>`;
+          }
+          dynamicInnerHtml += '</div>';
+          correctHistory.innerHTML += dynamicInnerHtml;
         }
         // }
 
@@ -187,9 +198,15 @@ function Lottery({}: Props) {
         const correctHistory = document.getElementById(
           `category__sub__history__${i}`
         );
+        const correctedCntEle = document.getElementById(
+          `category__sub__corrected__cnt__${i}`
+        );
 
         if (correctPercentage) {
           correctPercentage.innerHTML = '';
+        }
+        if (correctedCntEle) {
+          correctedCntEle.innerHTML = '';
         }
 
         if (correctHistory) {
@@ -290,7 +307,7 @@ function Lottery({}: Props) {
           <li>
             <h1>로또번호 설정</h1>
             <div className="contents">
-              <span>숫자범위</span>
+              <h2>숫자범위</h2>
               <span>
                 <LotteryNumberRange
                   rangeStartNum={rangeStartNum}
@@ -304,7 +321,7 @@ function Lottery({}: Props) {
             </div>
 
             <div className="contents">
-              <span>숫자갯수</span>
+              <h2>숫자갯수</h2>
               <span>
                 <LotteryNumberOfNumbers
                   numberOfInputs={numberOfInputs}
@@ -316,9 +333,8 @@ function Lottery({}: Props) {
             </div>
 
             <div className="contents">
-              <span>당첨번호</span>
-
               <LotteryNumberMethod
+                title={'당첨번호'}
                 setGenNumList={setGenWinNumList}
                 genNumList={genWinNumList}
                 numberOfInputs={numberOfInputs}
@@ -331,9 +347,8 @@ function Lottery({}: Props) {
             </div>
 
             <div className="contents">
-              <span>구입번호</span>
-
               <LotteryNumberMethod
+                title={'구입번호'}
                 setGenNumList={setGenBuyNumList}
                 genNumList={genBuyNumList}
                 numberOfInputs={numberOfInputs}
@@ -432,6 +447,13 @@ const ContentWrapper = styled.div`
 
         @media only screen and (max-width: 768px) {
           padding: 10px 20px;
+        }
+
+        h2 {
+          font-weight: bold;
+          padding: 0;
+          margin: 0;
+          font-size: 14px;
         }
       }
     }

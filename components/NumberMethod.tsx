@@ -23,6 +23,7 @@ const getSelectOptionList = ({
 };
 
 type Props = {
+  title: string;
   setGenNumList: Function;
   genNumList: number[];
   numberOfInputs: number;
@@ -34,6 +35,7 @@ type Props = {
 };
 
 function LotteryNumberMethod({
+  title,
   setGenNumList,
   genNumList,
   numberOfInputs,
@@ -45,22 +47,25 @@ function LotteryNumberMethod({
 }: Props) {
   return (
     <Wrapper>
-      <Switch
-        defaultChecked
-        checkedChildren="자동"
-        unCheckedChildren="수동"
-        onChange={(isGenAuto) => {
-          isGenAuto && setGenNumList([]);
-          setGenNumType(isGenAuto);
-        }}
-        checked={checked}
-        size={'default'}
-        disabled={gameStart}
-        style={{
-          marginRight: 15,
-          minWidth: 58,
-        }}
-      />
+      <div className={'switchWrapper'}>
+        <span>{title}</span>
+        <Switch
+          defaultChecked
+          checkedChildren="자동"
+          unCheckedChildren="수동"
+          onChange={(isGenAuto) => {
+            isGenAuto && setGenNumList([]);
+            setGenNumType(isGenAuto);
+          }}
+          checked={checked}
+          size={'default'}
+          disabled={gameStart}
+          style={{
+            marginRight: 20,
+            minWidth: 58,
+          }}
+        />
+      </div>
       <Select
         mode="multiple"
         allowClear
@@ -81,10 +86,19 @@ function LotteryNumberMethod({
 }
 
 const Wrapper = styled.div`
-  width: 70%;
+  width: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
+
+  .switchWrapper {
+    display: flex;
+    flex-direction: column;
+
+    span {
+      font-weight: bold;
+    }
+  }
 `;
 
 export default LotteryNumberMethod;
