@@ -1,44 +1,22 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Select, Switch, Button } from 'antd';
+import { Button } from 'antd';
 
 import styled from '@emotion/styled';
 import { css } from '@emotion/react';
-
-import 'antd/dist/antd.css';
 
 import LotteryNumberRange from '../components/NumberRange';
 import LotteryNumberOfNumbers from '../components/NumberOfNumbers';
 import LotteryNumberMethod from '../components/NumberMethod';
 import CorrectedNumber from '../components/CorrectedNumber';
 
-const { Option } = Select;
-
-type Props = {};
-
-const getSelectOptionList = ({
-  rangeStartNum,
-  rangeEndNum,
-}: {
-  rangeStartNum: number;
-  rangeEndNum: number;
-}) => {
-  const children: JSX.Element[] = [];
-  for (let i = rangeStartNum; i <= rangeEndNum; i++) {
-    children.push(
-      <Option value={i} key={i}>
-        {i}
-      </Option>
-    );
-  }
-  return children;
-};
+import 'antd/dist/antd.css';
 
 let gameCount = 0;
 let periodDay = 0;
 let numberOfTimesOfCorrection: { [key: string]: any } = {};
 const costForOneTry = 1000;
 
-function Lottery({}: Props) {
+function Lottery() {
   const [rangeStartNum, setRangeStartNum] = useState(1);
   const [rangeEndNum, setRangeEndNum] = useState(45);
   const [numberOfInputs, setNumberOfInputs] = useState(5);
