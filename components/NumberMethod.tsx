@@ -32,6 +32,7 @@ type Props = {
   rangeEndNum: number;
   checked: boolean;
   gameStart: boolean;
+  langpack: any;
 };
 
 function LotteryNumberMethod({
@@ -44,6 +45,7 @@ function LotteryNumberMethod({
   rangeEndNum,
   checked,
   gameStart,
+  langpack,
 }: Props) {
   return (
     <Wrapper>
@@ -51,8 +53,8 @@ function LotteryNumberMethod({
         <span>{title}</span>
         <Switch
           defaultChecked
-          checkedChildren="자동"
-          unCheckedChildren="수동"
+          checkedChildren={langpack.auto}
+          unCheckedChildren={langpack.manual}
           onChange={(isGenAuto) => {
             isGenAuto && setGenNumList([]);
             setGenNumType(isGenAuto);
@@ -73,8 +75,8 @@ function LotteryNumberMethod({
         <Select
           mode="multiple"
           allowClear
-          style={{ width: '100%' }}
-          placeholder={checked ? '' : '번호를 선택해주세요.'}
+          style={{ width: '100%', textAlign: 'center' }}
+          placeholder={checked ? '' : langpack.selectDesc}
           value={genNumList}
           onChange={(selectedList) => {
             if (selectedList.length <= numberOfInputs) {
@@ -100,6 +102,9 @@ const Wrapper = styled.div`
     display: flex;
     flex-direction: column;
     padding-right: 20px;
+    width: 80px;
+    align-items: center;
+    text-align: center;
 
     span {
       font-weight: bold;

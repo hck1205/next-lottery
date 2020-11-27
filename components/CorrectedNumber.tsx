@@ -6,9 +6,10 @@ const { Panel } = Collapse;
 
 type Props = {
   numberOfInputs: number;
+  langpack: any;
 };
 
-function CorrectedNumber({ numberOfInputs }: Props) {
+function CorrectedNumber({ numberOfInputs, langpack }: Props) {
   const leastNumber = useMemo(() => Math.floor(numberOfInputs / 2), []);
   return (
     <Wrapper>
@@ -16,7 +17,7 @@ function CorrectedNumber({ numberOfInputs }: Props) {
         {[...Array(numberOfInputs + 1)].map((_, index) => {
           const header = (
             <div key={`percentage_number_${index}`} className="percentage">
-              <div>{`${numberOfInputs - index}자리 맞춤`}</div>
+              <div>{`${numberOfInputs - index} ${langpack.numberMatched}`}</div>
               <span className="splitter" />
               <div
                 className="percentage"
@@ -46,7 +47,7 @@ function CorrectedNumber({ numberOfInputs }: Props) {
               forceRender={true}
             >
               {index > leastNumber ? (
-                <div>낮은 적중은 기록을 하지 않습니다.</div>
+                <div>{langpack.skipHistoryDesc}</div>
               ) : (
                 history
               )}
@@ -99,6 +100,7 @@ const Wrapper = styled.div`
       background: #e2e2e2;
       border-radius: 11px;
       margin: 6px 6px;
+      min-width: 130px;
 
       span {
         padding: 0 2.5px;

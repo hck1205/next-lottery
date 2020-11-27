@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Button } from 'antd';
+import { Select, Button } from 'antd';
 
 import styled from '@emotion/styled';
 import { css } from '@emotion/react';
@@ -8,8 +8,11 @@ import LotteryNumberRange from '../components/NumberRange';
 import LotteryNumberOfNumbers from '../components/NumberOfNumbers';
 import LotteryNumberMethod from '../components/NumberMethod';
 import CorrectedNumber from '../components/CorrectedNumber';
+import LangPack from '../langpack';
 
 import 'antd/dist/antd.css';
+
+const { Option } = Select;
 
 let gameCount = 0;
 let periodDay = 0;
@@ -17,6 +20,7 @@ let numberOfTimesOfCorrection: { [key: string]: any } = {};
 const costForOneTry = 1000;
 
 function Lottery() {
+  const [lang, setLang] = useState('EN');
   const [rangeStartNum, setRangeStartNum] = useState(1);
   const [rangeEndNum, setRangeEndNum] = useState(45);
   const [numberOfInputs, setNumberOfInputs] = useState(5);
@@ -45,6 +49,8 @@ function Lottery() {
   //투자금
   const moneySpendOnBuying = useRef<HTMLDivElement>(null);
 
+  const L = LangPack[lang];
+
   const startGame = () => {
     const updateText: any = setInterval(() => {
       let winNumber: number[] = genWinNumList;
@@ -56,21 +62,22 @@ function Lottery() {
 
       if (periodDayText.current) {
         if (gameCount % 5 === 0) {
-          periodDayText.current.innerHTML = ` ${(periodDay += 7)}일`;
+          periodDayText.current.innerHTML = ` ${(periodDay += 7)} ${L.day}`;
         }
       }
 
       if (periodMonthText.current) {
         const value = Math.floor(periodDay / 30);
-        if (value > 0) periodMonthText.current.innerHTML = ` ${value}개월`;
+        if (value > 0)
+          periodMonthText.current.innerHTML = ` ${value} ${L.month}`;
       }
 
       if (periodYearText.current) {
         const value = Math.floor(periodDay / 365);
         if (value > 0)
-          periodYearText.current.innerHTML = ` ${Math.floor(
-            periodDay / 365
-          )}년`;
+          periodYearText.current.innerHTML = ` ${Math.floor(periodDay / 365)} ${
+            L.year
+          }`;
       }
 
       // if (genWinNumType) { // 자동이면
@@ -140,16 +147,18 @@ function Lottery() {
           );
 
           if (correctedCntEle) {
-            correctedCntEle.innerHTML = `<div>${correctedCnt}회</div>`;
+            correctedCntEle.innerHTML = `<div>${correctedCnt} ${L.count}</div>`;
           }
         }
       }
 
       // 투자금
       if (moneySpendOnBuying.current) {
+        let currency = lang === 'KO' ? 'ko-KR' : 'en-EN';
+
         moneySpendOnBuying.current.innerHTML = `${(
           gameCount * costForOneTry
-        ).toLocaleString('ko-KR')}원`;
+        ).toLocaleString(currency)} ${L.currency}`;
       }
     }, 50);
     setGameStart(true);
@@ -211,6 +220,9 @@ function Lottery() {
       if (periodYearText.current) {
         periodYearText.current.innerHTML = '';
       }
+      if (moneySpendOnBuying.current) {
+        moneySpendOnBuying.current.innerHTML = '';
+      }
 
       setGenWinNumType(true);
       setGenWinNumList([]);
@@ -253,22 +265,22 @@ function Lottery() {
       <ContentWrapper>
         <ul>
           <li>
-            <h1>진행상황</h1>
+            <h1>{L.status}</h1>
 
             <StatisticsWrapper>
               <ul>
                 <li>
-                  게임 횟수:
+                  {L.gameCount}:
                   <span ref={gameCountText}>{` ${gameCount}`}</span>
                 </li>
                 <li>
-                  <span>구입 사용금액: </span>
+                  <span>{L.totalSpendMoney}:</span>
                   <div ref={moneySpendOnBuying} />
                 </li>
                 {/* <li>수익금:</li> */}
 
                 <li>
-                  당첨 로또 생성번호:
+                  {L.genWinLottryNum}:
                   <div
                     className={'statistic-lottery-number'}
                     ref={winNumberText}
@@ -276,7 +288,7 @@ function Lottery() {
                 </li>
 
                 <li>
-                  구입 로또 생성번호:
+                  {L.genBuyLottryNum}:
                   <div
                     className={'statistic-lottery-number'}
                     ref={buyNumberText}
@@ -286,66 +298,29 @@ function Lottery() {
 
               <ul>
                 <li>
-                  <span>기간: </span>
-                  <p>(일주일에 5장 구매시)</p>
-                  <div ref={periodDayText}>{` ${periodDay}일`}</div>
+                  <span>{L.language}:</span>
+                  <div>
+                    <Select
+                      defaultValue="EN"
+                      style={{ width: 120 }}
+                      onChange={(value) => {
+                        setLang(value);
+                      }}
+                    >
+                      <Option value="EN">{L.langEn}</Option>
+                      <Option value="KO">{L.langKo}</Option>
+                    </Select>
+                  </div>
+                </li>
+                <li>
+                  <span>{L.period}</span>
+                  <p>({L.periodDesc})</p>
+                  <div ref={periodDayText} />
                   <div ref={periodMonthText} />
                   <div ref={periodYearText} />
                 </li>
               </ul>
             </StatisticsWrapper>
-          </li>
-          <li>
-            <h1>로또번호 설정</h1>
-            <div className="contents">
-              <h2>숫자범위</h2>
-              <LotteryNumberRange
-                rangeStartNum={rangeStartNum}
-                setRangeStartNum={setRangeStartNum}
-                resetGame={resetGame}
-                gameStart={gameStart}
-                rangeEndNum={rangeEndNum}
-                setRangeEndNum={setRangeEndNum}
-              />
-            </div>
-
-            <div className="contents">
-              <h2>숫자갯수</h2>
-              <LotteryNumberOfNumbers
-                numberOfInputs={numberOfInputs}
-                setNumberOfInputs={setNumberOfInputs}
-                resetGame={resetGame}
-                gameStart={gameStart}
-              />
-            </div>
-
-            <div className="contents">
-              <LotteryNumberMethod
-                title={'당첨번호'}
-                setGenNumList={setGenWinNumList}
-                genNumList={genWinNumList}
-                numberOfInputs={numberOfInputs}
-                setGenNumType={setGenWinNumType}
-                rangeStartNum={rangeStartNum}
-                rangeEndNum={rangeEndNum}
-                checked={genWinNumType}
-                gameStart={gameStart}
-              />
-            </div>
-
-            <div className="contents">
-              <LotteryNumberMethod
-                title={'구입번호'}
-                setGenNumList={setGenBuyNumList}
-                genNumList={genBuyNumList}
-                numberOfInputs={numberOfInputs}
-                setGenNumType={setGenBuyNumType}
-                rangeStartNum={rangeStartNum}
-                rangeEndNum={rangeEndNum}
-                checked={genBuyNumType}
-                gameStart={gameStart}
-              />
-            </div>
           </li>
           <li>
             <ButtonWrapper>
@@ -362,7 +337,7 @@ function Lottery() {
                 }}
                 block
               >
-                시작
+                {L.start}
               </Button>
 
               <Button
@@ -373,16 +348,71 @@ function Lottery() {
                 block
                 danger
               >
-                정지
+                {L.stop}
               </Button>
               <Button type="default" onClick={() => resetGame()} block>
-                초기화
+                {L.reset}
               </Button>
             </ButtonWrapper>
           </li>
           <li>
-            <h1>적중기록</h1>
-            <CorrectedNumber numberOfInputs={numberOfInputs} />
+            <h1>{L.configLotteryNum}</h1>
+            <div className="contents">
+              <h2>{L.numberRange}</h2>
+              <LotteryNumberRange
+                rangeStartNum={rangeStartNum}
+                setRangeStartNum={setRangeStartNum}
+                resetGame={resetGame}
+                gameStart={gameStart}
+                rangeEndNum={rangeEndNum}
+                setRangeEndNum={setRangeEndNum}
+              />
+            </div>
+
+            <div className="contents">
+              <h2>{L.numberCount}</h2>
+              <LotteryNumberOfNumbers
+                numberOfInputs={numberOfInputs}
+                setNumberOfInputs={setNumberOfInputs}
+                resetGame={resetGame}
+                gameStart={gameStart}
+              />
+            </div>
+
+            <div className="contents">
+              <LotteryNumberMethod
+                title={L.winNumber}
+                setGenNumList={setGenWinNumList}
+                genNumList={genWinNumList}
+                numberOfInputs={numberOfInputs}
+                setGenNumType={setGenWinNumType}
+                rangeStartNum={rangeStartNum}
+                rangeEndNum={rangeEndNum}
+                checked={genWinNumType}
+                gameStart={gameStart}
+                langpack={L}
+              />
+            </div>
+
+            <div className="contents">
+              <LotteryNumberMethod
+                title={L.buyNumber}
+                setGenNumList={setGenBuyNumList}
+                genNumList={genBuyNumList}
+                numberOfInputs={numberOfInputs}
+                setGenNumType={setGenBuyNumType}
+                rangeStartNum={rangeStartNum}
+                rangeEndNum={rangeEndNum}
+                checked={genBuyNumType}
+                gameStart={gameStart}
+                langpack={L}
+              />
+            </div>
+          </li>
+
+          <li>
+            <h1>{L.correctionHistory}</h1>
+            <CorrectedNumber numberOfInputs={numberOfInputs} langpack={L} />
           </li>
         </ul>
       </ContentWrapper>
@@ -458,6 +488,7 @@ const ButtonWrapper = styled.div`
   button {
     width: 100%;
     height: 50px;
+    margin: 10px 0;
   }
 `;
 
@@ -468,7 +499,7 @@ const StatisticsWrapper = styled.div`
   padding: 10px ${sidePadding}px;
   border: 1px solid #dcdada;
   border-radius: 7px;
-  margin: 10px 10px;
+  margin: 10px 10px 0;
 
   @media only screen and (max-width: 768px) {
     padding: 10px 10px;
@@ -484,6 +515,11 @@ const StatisticsWrapper = styled.div`
       p {
         font-size: 12px;
         color: #888888;
+        margin: 0;
+      }
+
+      div {
+        margin: 5px 0;
       }
     }
 
