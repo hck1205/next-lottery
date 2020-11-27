@@ -10,7 +10,6 @@ import LotteryNumberRange from '../components/NumberRange';
 import LotteryNumberOfNumbers from '../components/NumberOfNumbers';
 import LotteryNumberMethod from '../components/NumberMethod';
 import CorrectedNumber from '../components/CorrectedNumber';
-import mitt from 'next/dist/next-server/lib/mitt';
 
 const { Option } = Select;
 
@@ -44,7 +43,7 @@ function Lottery({}: Props) {
   const [rangeEndNum, setRangeEndNum] = useState(45);
   const [numberOfInputs, setNumberOfInputs] = useState(5);
 
-  const [genWinNumType, setGenWinNumType] = useState(true);
+  const [genWinNumType, setGenWinNumType] = useState(true); // true 자동, false 수동
   const [genWinNumList, setGenWinNumList] = useState<number[]>([]);
 
   const [genBuyNumType, setGenBuyNumType] = useState(true);
@@ -96,19 +95,19 @@ function Lottery({}: Props) {
           )}년`;
       }
 
-      if (genWinNumType) {
-        winNumber = getRandomNum();
-        if (winNumberText.current) {
-          winNumberText.current.innerHTML = JSON.stringify(winNumber);
-        }
+      // if (genWinNumType) { // 자동이면
+      winNumber = getRandomNum('win');
+      if (winNumberText.current) {
+        winNumberText.current.innerHTML = winNumber.join(' ');
       }
+      // }
 
-      if (genBuyNumType) {
-        buyNumber = getRandomNum();
-        if (buyNumberText.current) {
-          buyNumberText.current.innerHTML = JSON.stringify(buyNumber);
-        }
+      // if (genBuyNumType) {
+      buyNumber = getRandomNum('buy');
+      if (buyNumberText.current) {
+        buyNumberText.current.innerHTML = buyNumber.join(' ');
       }
+      // }
 
       if (winNumber.length > 0 && buyNumber.length > 0) {
         let correctCnt = 0;
@@ -127,22 +126,22 @@ function Lottery({}: Props) {
           `${correctCnt}_corrected`
         ] = ++numberOfTimesOfCorrection[`${correctCnt}_corrected`];
 
-        // if (correctCnt > 2) {
-        const correctHistory = document.getElementById(
-          `category__sub__history__${correctCnt}`
-        );
-        if (correctHistory) {
-          let dynamicInnerHtml = "<div class='numbers-wrapper'>";
+        if (correctCnt > Math.floor(numberOfInputs / 2)) {
+          const correctHistory = document.getElementById(
+            `category__sub__history__${correctCnt}`
+          );
+          if (correctHistory) {
+            let dynamicInnerHtml = "<div class='numbers-wrapper'>";
 
-          for (let i = 0; i < buyNumber.length; i++) {
-            dynamicInnerHtml += `<span class=${
-              correctIndexList.indexOf(i) > -1 ? 'corrected' : 'incorrected'
-            }>${buyNumber[i]}</span>`;
+            for (let i = 0; i < buyNumber.length; i++) {
+              dynamicInnerHtml += `<span class=${
+                correctIndexList.indexOf(i) > -1 ? 'corrected' : 'incorrected'
+              }>${buyNumber[i]}</span>`;
+            }
+            dynamicInnerHtml += '</div>';
+            correctHistory.innerHTML += dynamicInnerHtml;
           }
-          dynamicInnerHtml += '</div>';
-          correctHistory.innerHTML += dynamicInnerHtml;
         }
-        // }
 
         for (let i = 0; i <= numberOfInputs; i++) {
           const correctPercentage = document.getElementById(
@@ -174,7 +173,7 @@ function Lottery({}: Props) {
           gameCount * costForOneTry
         ).toLocaleString('ko-KR')}원`;
       }
-    }, 50);
+    }, 1000);
     setGameStart(true);
     setIntervalId(updateText);
   };
@@ -246,14 +245,22 @@ function Lottery({}: Props) {
     }
   };
 
-  const getRandomNum = () => {
-    const numberList = [];
+  const getRandomNum = (type) => {
+    let genType, selectedNmberList;
+
+    genType = type === 'win' ? genWinNumType : genBuyNumType;
+    selectedNmberList = type === 'win' ? genWinNumList : genBuyNumList;
+
+    // const isSemiAuto = !genType && selectedNmberList.length < numberOfInputs;
+    const numberList = [...selectedNmberList];
+
     while (numberList.length !== numberOfInputs) {
       const number = Math.round(Math.random() * rangeEndNum);
       if (numberList.indexOf(number) < 0) {
         numberList.push(number);
       }
     }
+
     return numberList;
   };
 
@@ -277,20 +284,26 @@ function Lottery({}: Props) {
                   <span ref={gameCountText}>{` ${gameCount}`}</span>
                 </li>
                 <li>
-                  <span>투자금: </span>
+                  <span>구입 사용금액: </span>
                   <div ref={moneySpendOnBuying} />
                 </li>
                 {/* <li>수익금:</li> */}
-                {genWinNumType && (
-                  <li>
-                    당첨 로또 생성번호: <div ref={winNumberText} />
-                  </li>
-                )}
-                {genBuyNumType && (
-                  <li>
-                    구입 로또 생성번호: <div ref={buyNumberText} />
-                  </li>
-                )}
+
+                <li>
+                  당첨 로또 생성번호:
+                  <div
+                    className={'statistic-lottery-number'}
+                    ref={winNumberText}
+                  />
+                </li>
+
+                <li>
+                  구입 로또 생성번호:
+                  <div
+                    className={'statistic-lottery-number'}
+                    ref={buyNumberText}
+                  />
+                </li>
               </ul>
 
               <ul>
@@ -308,28 +321,24 @@ function Lottery({}: Props) {
             <h1>로또번호 설정</h1>
             <div className="contents">
               <h2>숫자범위</h2>
-              <span>
-                <LotteryNumberRange
-                  rangeStartNum={rangeStartNum}
-                  setRangeStartNum={setRangeStartNum}
-                  resetGame={resetGame}
-                  gameStart={gameStart}
-                  rangeEndNum={rangeEndNum}
-                  setRangeEndNum={setRangeEndNum}
-                />
-              </span>
+              <LotteryNumberRange
+                rangeStartNum={rangeStartNum}
+                setRangeStartNum={setRangeStartNum}
+                resetGame={resetGame}
+                gameStart={gameStart}
+                rangeEndNum={rangeEndNum}
+                setRangeEndNum={setRangeEndNum}
+              />
             </div>
 
             <div className="contents">
               <h2>숫자갯수</h2>
-              <span>
-                <LotteryNumberOfNumbers
-                  numberOfInputs={numberOfInputs}
-                  setNumberOfInputs={setNumberOfInputs}
-                  resetGame={resetGame}
-                  gameStart={gameStart}
-                />
-              </span>
+              <LotteryNumberOfNumbers
+                numberOfInputs={numberOfInputs}
+                setNumberOfInputs={setNumberOfInputs}
+                resetGame={resetGame}
+                gameStart={gameStart}
+              />
             </div>
 
             <div className="contents">
@@ -366,10 +375,8 @@ function Lottery({}: Props) {
                 type="primary"
                 onClick={() => {
                   if (
-                    (!genBuyNumType &&
-                      genBuyNumList.length === numberOfInputs) ||
-                    (!genWinNumType &&
-                      genWinNumList.length === numberOfInputs) ||
+                    (!genBuyNumType && genBuyNumList.length > 0) ||
+                    (!genWinNumType && genWinNumList.length > 0) ||
                     (genBuyNumType && genWinNumType)
                   ) {
                     !gameStart && startGame();
@@ -481,8 +488,12 @@ const StatisticsWrapper = styled.div`
   align-items: center;
   justify-content: space-between;
   padding: 10px ${sidePadding}px;
+  border: 1px solid #dcdada;
+  border-radius: 7px;
+  margin: 10px 10px;
+
   @media only screen and (max-width: 768px) {
-    padding: 10px 20px;
+    padding: 10px 10px;
   }
 
   ul {
@@ -496,6 +507,14 @@ const StatisticsWrapper = styled.div`
         font-size: 12px;
         color: #888888;
       }
+    }
+
+    .statistic-lottery-number {
+      text-align: center;
+      border: 1px solid #cacaca;
+      border-radius: 5px;
+      color: #1890ff;
+      height: 25px;
     }
   }
 `;

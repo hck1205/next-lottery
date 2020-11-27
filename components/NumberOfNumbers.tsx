@@ -1,3 +1,5 @@
+import styled from '@emotion/styled';
+
 import { Select } from 'antd';
 
 const { Option } = Select;
@@ -16,25 +18,53 @@ function LotteryNumberOfNumbers({
   gameStart,
 }: Props) {
   return (
-    <Select
-      value={numberOfInputs}
-      defaultValue={5}
-      onChange={(value) => {
-        setNumberOfInputs(value);
-        resetGame();
-      }}
-      style={{ width: 70 }}
-      disabled={gameStart}
-    >
-      {[...Array(3)].map((_, index) => {
-        const value = index + 5;
-        return (
-          <Option key={`range_end_num_${index}`} value={value}>
-            {value}
-          </Option>
-        );
-      })}
-    </Select>
+    <Wrapper>
+      <Select
+        value={numberOfInputs}
+        defaultValue={5}
+        onChange={(value) => {
+          setNumberOfInputs(value);
+          resetGame();
+        }}
+        style={{ width: '100%' }}
+        disabled={gameStart}
+      >
+        {[...Array(3)].map((_, index) => {
+          const value = index + 5;
+          return (
+            <Option
+              key={`select_option_${index}`}
+              className={'option'}
+              value={value}
+              style={{
+                textAlign: 'center',
+              }}
+            >
+              {value}
+            </Option>
+          );
+        })}
+      </Select>
+    </Wrapper>
   );
 }
+
+const Wrapper = styled.div`
+  width: 75%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  font-weight: bold;
+
+  .option {
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    height: 25px;
+  }
+`;
+
 export default LotteryNumberOfNumbers;

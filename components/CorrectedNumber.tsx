@@ -1,14 +1,15 @@
+import styled from '@emotion/styled';
+import { useMemo } from 'react';
 import { Collapse } from 'antd';
 
 const { Panel } = Collapse;
-
-import styled from '@emotion/styled';
 
 type Props = {
   numberOfInputs: number;
 };
 
 function CorrectedNumber({ numberOfInputs }: Props) {
+  const leastNumber = useMemo(() => Math.floor(numberOfInputs / 2), []);
   return (
     <Wrapper>
       <Collapse accordion>
@@ -44,7 +45,11 @@ function CorrectedNumber({ numberOfInputs }: Props) {
               key={`target_number_${index}`}
               forceRender={true}
             >
-              {history}
+              {index > leastNumber ? (
+                <div>낮은 적중은 기록을 하지 않습니다.</div>
+              ) : (
+                history
+              )}
             </Panel>
           );
         })}
@@ -56,7 +61,14 @@ const sidePadding = 30;
 const Wrapper = styled.div`
   .ant-collapse-content-box {
     padding: 5px;
+
+    div {
+      text-align: center;
+      color: #7d7d7d;
+      margin: 10px 0;
+    }
   }
+
   .percentage {
     display: flex;
     justify-content: space-around;
@@ -86,7 +98,7 @@ const Wrapper = styled.div`
       padding: 0 6px;
       background: #e2e2e2;
       border-radius: 11px;
-      margin: 6px 0;
+      margin: 6px 6px;
 
       span {
         padding: 0 2.5px;

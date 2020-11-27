@@ -61,26 +61,31 @@ function LotteryNumberMethod({
           size={'default'}
           disabled={gameStart}
           style={{
-            marginRight: 20,
             minWidth: 58,
           }}
         />
       </div>
-      <Select
-        mode="multiple"
-        allowClear
-        style={{ width: '100%' }}
-        placeholder={checked ? '' : '번호를 선택해주세요.'}
-        value={genNumList}
-        onChange={(selectedList) => {
-          if (selectedList.length <= numberOfInputs) {
-            setGenNumList(selectedList);
-          }
-        }}
-        disabled={gameStart || checked}
-      >
-        {getSelectOptionList({ rangeStartNum, rangeEndNum })}
-      </Select>
+      <div className={'selectWrapper'}>
+        {gameStart &&
+          !checked &&
+          genNumList.length < numberOfInputs &&
+          genNumList.length !== 0 && <p>Semi-Auto</p>}
+        <Select
+          mode="multiple"
+          allowClear
+          style={{ width: '100%' }}
+          placeholder={checked ? '' : '번호를 선택해주세요.'}
+          value={genNumList}
+          onChange={(selectedList) => {
+            if (selectedList.length <= numberOfInputs) {
+              setGenNumList(selectedList);
+            }
+          }}
+          disabled={gameStart || checked}
+        >
+          {getSelectOptionList({ rangeStartNum, rangeEndNum })}
+        </Select>
+      </div>
     </Wrapper>
   );
 }
@@ -94,9 +99,31 @@ const Wrapper = styled.div`
   .switchWrapper {
     display: flex;
     flex-direction: column;
+    padding-right: 20px;
 
     span {
       font-weight: bold;
+    }
+  }
+
+  .selectWrapper {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+
+    p {
+      padding: 0;
+      margin: 0;
+      font-size: 11px;
+      color: #ea3434;
+      font-weight: bold;
+    }
+    .ant-select-selector {
+      padding: 0 5px;
+
+      .ant-select-selection-item {
+        padding: 0 5px;
+      }
     }
   }
 `;
