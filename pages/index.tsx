@@ -17,10 +17,10 @@ const { Option } = Select;
 let gameCount = 0;
 let periodDay = 0;
 let numberOfTimesOfCorrection: { [key: string]: any } = {};
-const costForOneTry = 1000;
 
 function Lottery() {
   const [lang, setLang] = useState('EN');
+
   const [rangeStartNum, setRangeStartNum] = useState(1);
   const [rangeEndNum, setRangeEndNum] = useState(45);
   const [numberOfInputs, setNumberOfInputs] = useState(5);
@@ -154,11 +154,19 @@ function Lottery() {
 
       // 투자금
       if (moneySpendOnBuying.current) {
-        let currency = lang === 'KO' ? 'ko-KR' : 'en-EN';
+        let currency = '';
 
-        moneySpendOnBuying.current.innerHTML = `${(
-          gameCount * costForOneTry
-        ).toLocaleString(currency)} ${L.currency}`;
+        if (lang === 'KO') {
+          currency = `${(gameCount * 1000).toLocaleString('ko-KR')} ${
+            L.currency
+          }`;
+        } else {
+          currency = `${(gameCount * 2).toLocaleString('en-EN')} ${L.currency}`;
+        }
+
+        console.log('currency', currency);
+
+        moneySpendOnBuying.current.innerHTML = currency;
       }
     }, 50);
     setGameStart(true);
