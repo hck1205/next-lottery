@@ -173,7 +173,7 @@ function Lottery({}: Props) {
           gameCount * costForOneTry
         ).toLocaleString('ko-KR')}원`;
       }
-    }, 1000);
+    }, 50);
     setGameStart(true);
     setIntervalId(updateText);
   };
