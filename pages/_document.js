@@ -8,7 +8,7 @@ class MyDocument extends Document {
 
   render() {
     return (
-      <Html lang="ko">
+      <Html lang="en">
         <title>Lottery Simulator</title>
         <meta charSet="UTF-8" />
         <meta
@@ -17,7 +17,7 @@ class MyDocument extends Document {
         />
         <meta
           name="keywords"
-          content="로또, 당첨번호, 로또당첨번호, 로또 당첨번호, Lottery, Lottery win number, lottery simulator, 로또 시뮬레이터, 로또 자동, auto lottery, automatic lottery, magic number, 행운의 숫자, 럭키넘버, 럭키숫자, 로또 자동번호, 로또 확률, lottery percetance, chance of winning, lottery won price, 로또 상금 금액, 로또 금액, 로또 1등, lottery simulator"
+          content="로또, 로또번호, 로또 시뮬레이터, 로또1등, 로또금액, 로또상금, 1등 번호, 당첨번호, 로또 금액, lottery, lottery winning number, lottery simulator, 로또 자동, auto lottery, automatic lottery, magic number, 행운의 숫자, 럭키넘버, 럭키숫자, 로또 자동번호, 로또 확률, lottery percetance, chance of winning, lottery won price, 로또 상금 금액, 로또 금액, 로또 1등, lottery simulator"
         ></meta>
         <meta name="robots" content="index, follow" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -41,12 +41,22 @@ class MyDocument extends Document {
         />
         <link rel="manifest" href="/site.webmanifest" />
         <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5" />
-
         <script
           data-ad-client="ca-pub-7386190152766710"
           async
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"
         ></script>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+                      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+                      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+                      })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+                        ga('create', 'G-XJV8V15NF4', 'auto');
+                        ga('send', 'pageview');`,
+          }}
+        ></script>
+
         <Head />
         <body>
           <Main />

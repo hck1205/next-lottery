@@ -50,7 +50,7 @@ export default {
     numberCount: 'Number Count',
     winNumber: 'Winning Numbers',
     buyNumber: 'Chosen Numbers',
-    correctionHistory: 'Matching history',
+    correctionHistory: 'Matching History',
     numberMatched: 'matched',
     count: 'times',
     start: 'Start',
